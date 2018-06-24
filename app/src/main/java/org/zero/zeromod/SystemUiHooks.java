@@ -17,14 +17,13 @@ import java.util.Locale;
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XC_MethodReplacement;
-import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 import static de.robv.android.xposed.XposedHelpers.callMethod;
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 import static de.robv.android.xposed.XposedHelpers.getBooleanField;
 import static de.robv.android.xposed.XposedHelpers.getObjectField;
 
-public class ModHooks implements IXposedHookLoadPackage {
+public class SystemUiHooks implements IXposedHookLoadPackage {
 
     private static final String CLASS_STATUSBAR = "com.android.systemui.statusbar.phone.StatusBar";
     private static final String CLASS_COLLAPSED_SB_FRAGMENT = "com.android.systemui.statusbar.phone.CollapsedStatusBarFragment";
@@ -38,12 +37,12 @@ public class ModHooks implements IXposedHookLoadPackage {
 
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) {
+
         if (!lpparam.packageName.equals("com.android.systemui"))
             return;
         classLoader = lpparam.classLoader;
 
         CustomClock(); //Few lines of code from Gravity Box
-
 
         //Hide Roaming in signal cluster
         findAndHookMethod(CLASS_PHONESTATE, classLoader, "apply","boolean",new XC_MethodHook() {
@@ -66,17 +65,6 @@ public class ModHooks implements IXposedHookLoadPackage {
                     callMethod(mDataController, "setMobileDataEnabled", true);
                 }
                 return null;
-            }
-        });
-
-        //RIP Screenshot audio
-        findAndHookMethod("com.android.systemui.screenshot.SaveImageInBackgroundTask$GlobalScreenshot", classLoader, "startAnimation", "Runnable","int","int","boolean","boolean", new XC_MethodHook() {
-            @Override
-            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                XposedBridge.log("Panni startAnimation method hooked");
-                Object mCameraSound = getObjectField(param.thisObject,"mCameraSound");
-                callMethod(mCameraSound,"play","null");
-                super.beforeHookedMethod(param);
             }
         });
     }
@@ -139,7 +127,6 @@ public class ModHooks implements IXposedHookLoadPackage {
         findAndHookMethod("com.android.systemui.statusbar.policy.Clock", classLoader, "updateClock", new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) {
-                XposedBridge.log("Panni : updateClock hooked");
                 mClock = (TextView) param.thisObject;
                 String customTime = new SimpleDateFormat("ddEEE h:m",Locale.ENGLISH).format(new Date()).toLowerCase();
                 SpannableStringBuilder customTimeBuilder = new SpannableStringBuilder(customTime);
