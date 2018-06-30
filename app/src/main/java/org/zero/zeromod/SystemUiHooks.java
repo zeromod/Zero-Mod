@@ -128,7 +128,7 @@ public class SystemUiHooks implements IXposedHookLoadPackage {
             @Override
             protected void afterHookedMethod(MethodHookParam param) {
                 mClock = (TextView) param.thisObject;
-                String customTime = new SimpleDateFormat("ddEEE h:m",Locale.ENGLISH).format(new Date()).toLowerCase();
+                String customTime = new SimpleDateFormat("ddEEE h:mm",Locale.ENGLISH).format(new Date());
                 SpannableStringBuilder customTimeBuilder = new SpannableStringBuilder(customTime);
                 customTimeBuilder.setSpan(new RelativeSizeSpan(0.7f),0,5/* Example 23sat, count is 5*/, Spanned.SPAN_EXCLUSIVE_INCLUSIVE);
                 mClock.setText(customTimeBuilder);
