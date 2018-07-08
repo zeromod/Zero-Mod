@@ -1,2 +1,3 @@
 org.zero.zeromod.SystemUiHooks
 org.zero.zeromod.MediaActionHook
+org.zero.zeromod.NetworkTrafficHook
